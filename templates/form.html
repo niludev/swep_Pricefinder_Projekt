@@ -3,7 +3,9 @@
 
 {% block form %}
 
-<form id="submitForm">
+<form method="post" id="submitForm">
+  <!-- Security feature prevents cross-site request forgery attacks -->
+  {% csrf_token %}
     <fieldset>
       <legend>Car Details</legend>
       <div class="row">
@@ -105,13 +107,34 @@
       // code
 
 
+        const form = new FormData(e.currentTarget)
+        const data = {}
 
+        form.forEach((val, key) => {
+            data[key] = val
+        })
 
-
-      const form = new FormData(e.currentTarget)
-      const exampleSelect = form.get("exampleSelect1")
-
-      console.log(exampleSelect)
+        fetch('/submit', {
+            method: 'POST', // Specify the method
+            headers: {
+                'Content-Type': 'application/json', // Specify the content type as JSON
+            },
+            body: JSON.stringify(data) // Convert the JavaScript object to a JSON string
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // If the server response is not ok, throw an error
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the JSON response
+            })
+            .then(response => {
+                const responseElement = document.getElementById("response-text")
+                responseElement.innerText = response.price
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     })
   })
 </script>
