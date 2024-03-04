@@ -40,6 +40,9 @@ INSTALLED_APPS = [
 
     #local
     'header',
+    'car_data',
+    'price_prediction',
+    'user_interface',
 ]
 
 MIDDLEWARE = [
