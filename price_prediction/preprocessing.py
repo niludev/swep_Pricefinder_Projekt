@@ -26,7 +26,7 @@ data[numerical_features] = scaler.fit_transform(data[numerical_features])
 
 
 y = data['price']
-x = data.drop('price',axis=1)
+X = data.drop('price',axis=1)
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
