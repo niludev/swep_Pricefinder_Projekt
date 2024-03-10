@@ -22,4 +22,5 @@ urlpatterns = [
     # path('', include('base.urls')),
     path('', include('user_interface.urls')),
     # path('', include('header.urls')),
+    path('price_prediction/', include('price_prediction.urls'))
 ]

@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
+
+from price_prediction.views import PredictView
 from .models import Form
 from django.views import View
 from django.http import JsonResponse
@@ -21,8 +23,14 @@ class indexView(ListView):
 @method_decorator(csrf_exempt, name='dispatch')  # Disable CSRF token for this view
 class submitView(View):
     def post(self, request) -> JsonResponse:
-        data = json.loads(request.body)
-        # ......
+        # data = json.loads(request.body)
+        # # ......
+        # # price = 120000
         # price = 120000
-        price = 120000
-        return JsonResponse({'price': price})
+        # return JsonResponse({'price': price})
+
+        data = json.loads(request.body)
+
+        predict_view = PredictView()
+        response= predict_view.post(request)
+        return JsonResponse({'price': response})

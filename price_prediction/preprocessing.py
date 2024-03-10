@@ -1,32 +1,32 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from django.conf import settings
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from joblib import dump
+import pandas as pd
 
-DATASET_PATH = 'datasets/car_price_prediction.csv'
-data = pd.read_csv(DATASET_PATH)
+# Load data
+data = pd.read_csv('datasets/car_price_prediction.csv')
 
-selected_columns = [
-    'price', 'manufacturer', 'model', 'prod.year', 'category', 'leather interior', 'fuel type', 'engine volume',
-    'mileage', 'cylinders', 'gear box type', 'drive wheels', 'color', 'airbags'
-]
+# Definieren Sie numerische und kategorische Spalten
+numerical_cols = ['Mileage', 'Engine volume', 'Cylinders', 'Airbags', 'Prod. year']
+categorical_cols = ['Manufacturer', 'Model', 'Category', 'Leather interior', 'Fuel type', 'Gear box type', 'Drive wheels', 'Color']
 
-data = data[selected_columns]
-data = data.dropna()
-#data['mileage'].fillna(value=data['mileage'].mean(), inplace=True)
+# Entfernen von 'km' und Umwandeln von 'Mileage' in float
+data['Mileage'] = data['Mileage'].str.replace(' km', '').astype(float)
 
-numerical_features = ['Mileage', 'Engine volume', 'Cylinders', 'Airbags', 'Prod. year']
-categorical_features = ['Manufacturer', 'Model', 'Category', 'Leather interior', 'Fuel type', 'Gear box type', 'Drive wheels', 'Color']
-data = pd.get_dummies(data, columns=categorical_features)  # ['manufacturer', 'model', 'gear.box.type', 'drive.wheels', 'color']
+# Entfernen von 'Turbo' und anderen nicht numerischen Zeichen aus 'Engine volume'
+data['Engine volume'] = data['Engine volume'].str.extract('(\d+\.\d+|\d+)')[0].astype(float)
 
-scaler = StandardScaler()
-data[numerical_features] = scaler.fit_transform(data[numerical_features])
+# One-Hot-Encode kategorische Variablen
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numerical_cols),
+        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
+    ]
+)
 
+# Fitting the preprocessor
+preprocessor.fit(data)
 
-y = data['price']
-X = data.drop('price',axis=1)
-
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Speichern des Preprocessors
+dump(preprocessor, 'preprocessor.joblib')

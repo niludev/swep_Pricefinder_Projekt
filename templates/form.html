@@ -130,12 +130,17 @@
             })
             .then(response => {
                 const responseElement = document.getElementById("response-text")
-                responseElement.innerText = response.price
+                responseElement.innerText = `Predicted Price: ${response.predicted_price}`
             })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
     })
   })
+
+  {#.then(response => {#}
+  {#              const responseElement = document.getElementById("response-text")#}
+  {#              responseElement.innerText = response.price#}
+  {#          })#}
 </script>
 {% endblock scripts%}
